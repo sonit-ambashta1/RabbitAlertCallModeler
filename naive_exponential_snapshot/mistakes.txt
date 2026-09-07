@@ -1,0 +1,2 @@
+1. The graphs only account for the amount of rabbits at discrete time intervals not the continuous timeframe
+- as a result one cannot properly model. Will aim to change that
