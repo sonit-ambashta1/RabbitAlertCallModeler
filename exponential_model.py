@@ -19,8 +19,8 @@ Assumptions:
 - One or more rabbits may initially detect a predator.
 - The spread rate is a user-supplied parameter and is not currently
   estimated from observed rabbit behavior.
+- The spread rate is intended to satisfy the relationship 0 < r <= 1 to prevent explosion or inflated answers
 - All rabbits are equally capable of receiving and transmitting alerts.
-- Rabbit behavior is homogeneous across the population.
 - Environmental factors (terrain, vegetation, weather, visibility)
   are ignored.
 - Predator behavior is not modeled.
@@ -64,7 +64,7 @@ def gather_data(solution: Equality):
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Insert parameters for modeling rabbit alert calls.")
     parser.add_argument("--initial_alerted", type=int, default=1, help="Number of rabbits that detect the predator immediately")
-    parser.add_argument("--spread_rate", type=float, default = 1.5, help="Fastness of how rabbits alert each other")
+    parser.add_argument("--spread_rate", type=float, default = 0.1, help="Fastness of how rabbits alert each other")
     args = parser.parse_args()
     
     equation = form_differential_equation(args.spread_rate)
