@@ -63,6 +63,22 @@ def gather_data(solution: Equality):
         num_alerted.append(right.subs(t, i))
     return times, num_alerted
 
+def gather_data(solution: Equality,
+                start_time: float,
+                end_time: float,
+                num_points: int):
+    time_values = np.linspace(start_time, end_time, num_points)
+
+    alert_function = lambdify(
+        t,
+        solution.rhs,
+        modules=['numpy']
+    )
+
+    alert_values = alert_function(time_values)
+
+    return time_values, alert_values
+
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Insert parameters for modeling rabbit alert calls.")
     parser.add_argument("--initial_alerted", type=int, default=1, help="Number of rabbits that detect the predator immediately")

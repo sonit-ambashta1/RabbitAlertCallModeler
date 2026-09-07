@@ -63,6 +63,22 @@ def gather_data(solution: Equality, carrying_capacity: int):
         num_alerted.append(min(right.subs(t, i), carrying_capacity))
     return times, num_alerted
 
+def gather_data(solution: Piecewise,
+                start_time: float,
+                end_time: float,
+                num_points: int):
+    time_values = np.linspace(start_time, end_time, num_points)
+
+    alert_function = lambdify(
+        t,
+        solution,
+        modules=['numpy']
+    )
+
+    alert_values = alert_function(time_values)
+
+    return time_values, alert_values
+
 def find_point_of_intersection(solution: Equality, carrying_capacity: int):
     equation = Eq(carrying_capacity, solution.rhs)
     point = solve(equation, t)

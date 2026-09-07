@@ -24,8 +24,8 @@ if __name__=="__main__":
         for rate in args.spread_rates:
             equation = exponential_model.form_differential_equation(rate)
             solution = exponential_model.solve_equation(equation, initial_point)
-            x, y = exponential_model.gather_data(solution)
-            plt.plot(x, y, label=f"Growth Rate: {rate}")
+            x, y = exponential_model.gather_data(solution, start_time=0, end_time=5, num_points=100)
+            plt.plot(x, y, label=f"Growth Rate: {round(rate, 2)}")
         plt.legend()
         plt.savefig(f"rabbit_alerts_{initial_point}_spread_rates_naive_exponential.png")
         plt.close()
@@ -41,8 +41,11 @@ if __name__=="__main__":
         for rate in args.spread_rates:
             equation = capped_exponential_model.form_differential_equation(rate)
             solution = capped_exponential_model.solve_equation(equation, initial_point)
-            x, y = capped_exponential_model.gather_data(solution, args.capacity)
-            plt.plot(x, y, label=f"Growth Rate: {rate}")
+            poi = capped_exponential_model.find_point_of_intersection(solution, args.capacity)
+            piecewise_solution = capped_exponential_model.form_piecewise_solution(solution, args.capacity, poi)
+            x, y = capped_exponential_model.gather_data(piecewise_solution, start_time=0, end_time=5, num_points=100)
+            
+            plt.plot(x, y, label=f"Growth Rate: {round(rate, 2)}")
         plt.legend()
         plt.savefig(f"rabbit_alerts_{initial_point}_spread_rates_capped_exponential.png")
         plt.close()
