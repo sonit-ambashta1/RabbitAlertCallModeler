@@ -8,8 +8,9 @@
 \usepackage[export]{adjustbox} % for max width/height options
 \usepackage{placeins} % for \FloatBarrier
 \setlength{\parindent}{0pt}
-\usepackage{minted}
-\title{Modeling the Capped Exponential Function}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\title{Rabbit Alert Modeling Project}
 \author{Sonit Ambashta}
 \date{\today}
 \usepackage[a4paper,top=1cm, bottom=1cm, left=2cm, right=2cm]{geometry}
@@ -19,8 +20,129 @@
 \begin{document}
 \maketitle
 
+\section{Variables}
 \begin{itemize}
-    \item Find the Naive Equation
+    \item $t$: time (in steps, can adapt to days/minutes/seconds as needed)
+    \item $A(t)$: number of alerted rabbits at time $t$
+    \item $k$: alert propagation rate, measuring how quickly alerted rabbits cause additional rabbits to become alerted
+    \item $\frac{dA}{dt}$: instantaneous rate of change of the alerted rabbit population.
+    \item $P$: maximum number of alerted rabbits (capacity of the habitat)
+\end{itemize}
+
+\section{Assumptions}
+\begin{itemize}
+\item The rabbit population contains at least one rabbit. 
+\item One or more rabbits may initially detect the predator. 
+\item Alert propagation occurs through interactions between rabbits and is modeled as proportional to the number of rabbits that are already alerted. 
+\item The alert propagation rate $k$ is treated as a user-defined parameter because an empirically validated value is not currently available. 
+\item All rabbits are equally capable of receiving and transmitting warning signals. 
+\item Once alerted, a rabbit remains alerted for the duration of the simulation. 
+\item Environmental effects such as terrain, vegetation density, weather, and visibility are ignored. 
+\item Predator behavior and movement are not modeled. 
+\item Time is treated as a continuous variable. 
+\item The rabbit population is assumed to be well-mixed, meaning each alerted rabbit has an equal opportunity to influence any other rabbit.
+\item The model is intended for wild rabbit populations and does not account for behaviors associated with domesticated rabbits.
+\item Differences in alert behavior among rabbit species are not modeled. All wild rabbits are treated as having identical alert-propagation characteristics.
+\end{itemize}
+
+\section{Differential Equation and Approach}
+\[ \frac{dA}{dt} = kA \]
+
+Note: this is a separable differential equation
+\begin{itemize}
+    \item multiply $dt$ on both sides
+    \[ dA = kA dt \]
+    \item divide $A$ on both sides
+    \[ \frac{1}{A}dA = k dt \]
+    \item integrate both sides (don't forget the constant of integration)
+    \[ \int\frac{1}{A}dA = \int k dt \]
+    \[ ln |A| = kt + C \]
+    \item isolate A
+    \[ A = e^{kt + C}\]
+    \item use exponent rules to separate the C 
+    \[ A = e^C e^{kt} \] 
+    \item let $e^C$ be an arbitrary constant $C_1$ 
+    \[ A = C_1 e^{kt} \] 
+    \item apply the initial condition $A(0)=A_0$ 
+    \[ A_0 = C_1 e^{k(0)} \] 
+    \item simplify since $e^0 = 1$ 
+    \[ A_0 = C_1 \] 
+    \item substitute $C_1 = A_0$ back into the solution 
+    \[ A = A_0 e^{kt} \]
+\end{itemize}
+
+\subsection{Example Model} Suppose a user provides 
+\[ k = 0.7 \] and \[ A_0 = 2. \] 
+The differential equation becomes 
+\[ \frac{dA}{dt} = 0.7A. \] 
+Using the solution derived previously, 
+\[ A(t)=A_0e^{kt}, \] 
+we substitute the values of $A_0$ and $k$: 
+\[ A(t)=2e^{0.7t}. \] 
+This function models the number of alerted rabbits 
+over time assuming that each alerted rabbit contributes 
+proportionally to the spread of awareness throughout the population. 
+The corresponding Python code is: 
+\begin{verbatim} 
+>>> equation = form_differential_equation(0.7)
+>>> solution = solve_equation(equation, 2)
+>>> print(solution)
+\end{verbatim} 
+Output: 
+\begin{verbatim} 
+Eq(A(t), 2*exp(0.7*t))
+\end{verbatim} 
+Some example evaluations are: 
+\[ A(0)=2e^0=2 \] \[ A(1)=2e^{0.7}\approx 4.03 \] \[ A(2)=2e^{1.4}\approx 8.11 \] \[ A(3)=2e^{2.1}\approx 16.33 \] These values illustrate the exponential nature of the model, where the number of alerted rabbits grows increasingly rapidly over time. This behavior motivates the introduction of a population cap in later versions of the model.
+\subsection{Notes}
+\begin{itemize}
+    \item This equation is for any arbitrary k that will be plugged in (user adjustable), however growth cannot be demonstrated for $k = 0$ since
+that would signify no change.
+    \item Right now, there is not a supporting rate at which rabbits get alerted, so this serves as a user-adjustable cli interface that allows adding a rate
+    \item A certain number of rabbits can be alerted at a moment of time (especially when they are together), so the initial value setup can also be provided by the user
+    \item In this model, it is also assumed that there is no upper bound on the number of rabbits that can be alerted at any given time.
+\end{itemize}
+
+\section{Major Issue with this Approach and Proposed Solution} 
+The original model assumed an unlimited rabbit population, producing unbounded exponential growth. 
+This assumption was later relaxed through the introduction of a carrying-capacity parameter $P$, 
+resulting in a capped exponential model. The idea is to allow exponential growth until the number 
+of alerted rabbits reaches the maximum number of rabbits in the habitat. To determine when this occurs, 
+solve for the point of intersection between the exponential solution and the carrying capacity.
+ \[ A(t)=A_0e^{kt} \] \[ P=A_0e^{kt} \] 
+ Divide both sides by $A_0$: 
+ \[ \frac{P}{A_0}=e^{kt} \] 
+ Take the natural logarithm of both sides:
+\[ \ln\left(\frac{P}{A_0}\right)=kt \] 
+ Solve for $t$: 
+ \[ t^*=\frac{\ln(P/A_0)}{k} \] 
+ where $t^*$ represents the time at which the alerted population reaches the habitat capacity. 
+ Once this point is reached, there are no additional rabbits available to become alerted. Therefore, 
+ the rate of change becomes zero. This gives the piecewise differential equation 
+ \[ \frac{dA}{dt} = \begin{cases} kA, & A < P, \\ 0, & A \ge P. \end{cases} \] 
+ The corresponding piecewise solution is 
+ \[ A(t) = \begin{cases} A_0e^{kt}, & t < t^*, \\ P, & t \ge t^*. \end{cases} \] 
+ where \[ t^*=\frac{\ln(P/A_0)}{k}. \]
+
+\section{Inspiration and Rationale}
+\begin{itemize}
+    \item This project began as an opportunity to apply differential equations outside of a classroom setting and 
+explore how mathematical models can be used to represent real-world phenomena programmatically. Rabbits 
+were chosen as the motivating domain because they are an important component of many ecosystems and 
+serve as prey for a wide range of predators. Their survival often depends on the rapid detection and 
+communication of threats, making predator-awareness propagation a natural phenomenon to explore through 
+differential equations. The initial goal was not to produce a biologically validated model. Rather, 
+the objective was to practice the process of mathematical modeling: defining assumptions, constructing 
+a differential equation, solving the equation analytically, implementing the solution in Python, and 
+evaluating the realism and limitations of the resulting model. 
+    \item As development progressed, the project evolved beyond simply solving an exponential differential equation. 
+The model was extended to include a finite habitat capacity after it became clear that unrestricted exponential 
+growth implied an unrealistic infinite rabbit population. This led to the introduction of a capped exponential 
+model and further discussion regarding alternative modeling approaches and their underlying assumptions. 
+    \item Although a validated behavioral propagation rate is not currently available, the framework is designed as a 
+command-line utility for exploring different parameter combinations. The project may serve as an educational tool 
+for learning differential equations and mathematical modeling, while also providing a foundation for future 
+investigations into rabbit behavior, ecosystem dynamics, and animal communication.
 \end{itemize}
 
 \end{document}
