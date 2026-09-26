@@ -28,6 +28,7 @@ Assumptions:
 - Once a rabbit becomes alerted, it remains alerted for the duration
   of the simulation.
 - Time is treated as continuous in the differential equation model.
+- Born rate for rabbits and death rate is considered to be constant and is not a function of time
 
 Limitations:
 - The model does not account for communication failures.

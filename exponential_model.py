@@ -28,6 +28,7 @@ Assumptions:
 - Once a rabbit becomes alerted, it remains alerted for the duration
   of the simulation.
 - Time is treated as continuous in the differential equation model.
+- Population size is fixed and does not account for rabbits born or dead
 
 Limitations:
 - The model does not account for communication failures.
