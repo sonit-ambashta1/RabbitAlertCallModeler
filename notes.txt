@@ -1,0 +1,14 @@
+Defense Tactics:
+- Phase 1: detect and hide
+- Phase 2: escape/run
+- Phase 3: attack
+
+Factors Behavior:
+- Environment
+
+Potential PDE:
+- num alerted (can be influenced based on already alerted rabbits and threat detection)
+
+
+
+Predator awareness is not the only thing influencing alert calls

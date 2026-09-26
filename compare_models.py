@@ -38,7 +38,7 @@ if __name__=="__main__":
             plt.title(f"Rabbit Alert Call Model Distribution with 1 Initial Alerted Rabbit (Capped Exponential)")
         else:
             plt.title(f"Rabbit Alert Call Model Distribution with {initial_point} Initial Alerted Rabbits (Capped Exponential)")
-        for rate in args.spread_rates:
+        for rate in args.spread_rates[::-1]:
             equation = capped_exponential_model.form_differential_equation(rate)
             solution = capped_exponential_model.solve_equation(equation, initial_point)
             poi = capped_exponential_model.find_point_of_intersection(solution, args.capacity)

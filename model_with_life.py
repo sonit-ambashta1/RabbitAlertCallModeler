@@ -27,7 +27,6 @@ Assumptions:
 - Predator behavior is not modeled.
 - Once a rabbit becomes alerted, it remains alerted for the duration
   of the simulation.
-- Population size is fixed and does not account for rabbits born or dead
 - Time is treated as continuous in the differential equation model.
 
 Limitations:
@@ -45,9 +44,9 @@ Future Work:
 - Compare exponential, logistic, and capped-growth models.
 """
 
-def form_differential_equation( spread_rate: float):
+def form_differential_equation(born: int, dead: int,spread_rate: float):
     A = Function('A')
-    return Eq(diff(A(t), t), spread_rate * A(t))
+    return Eq(diff(A(t), t), spread_rate * A(t) + (born - dead))
 
 def solve_equation(equation: Eq, a_0: int):
     A = Function('A')
@@ -94,13 +93,15 @@ def form_piecewise_solution(solution: Equality, carrying_capacity: int, poi: flo
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Insert parameters for modeling rabbit alert calls.")
+    parser.add_argument("--born", type=int, default=0, help="Number of rabbits born in a warren/burrow")
+    parser.add_argument("--dead", type=int, default=0, help="Number of rabbits that die in a warren/burrow")
     parser.add_argument("--initial_alerted", type=int, default=1, help="Number of rabbits that detect the predator immediately")
     parser.add_argument("--spread_rate", type=float, default = 0.1, help="Fastness of how rabbits alert each other")
     parser.add_argument("--capacity", type=int, default = 15, help="Number of rabbits as part of the habitat")
 
     args = parser.parse_args()
     
-    equation = form_differential_equation(args.spread_rate)
+    equation = form_differential_equation(args.born, args.dead, args.spread_rate)
     solution = solve_equation(equation, args.initial_alerted)
     
     find_cap_point = find_point_of_intersection(solution, args.capacity)
@@ -125,4 +126,5 @@ if __name__=="__main__":
     plt.plot(time_values, alert_values)
     plt.axvline(x=find_cap_point, color="red")
     
-    plt.savefig(f"rabbit_alerts_naive_initial_{args.initial_alerted}_rate_{args.spread_rate}_capped.png")
+    plt.savefig(f"rabbit_alerts_naive_initial_{args.initial_alerted}_rate_{args.spread_rate}_born_{args.born}_dead_{args.dead}.png")
+    
