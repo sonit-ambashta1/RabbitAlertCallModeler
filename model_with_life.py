@@ -1,4 +1,5 @@
 import numpy as np
+import sympy
 from sympy import Eq, Equality, diff, Function, Symbol, lambdify, Piecewise
 from sympy.solvers import dsolve, solve
 from sympy.abc import t
@@ -86,10 +87,14 @@ def find_point_of_intersection(solution: Equality, carrying_capacity: int):
     return point[0]
 
 def form_piecewise_solution(solution: Equality, carrying_capacity: int, poi: float):
-    piecewise_func = Piecewise(
-        (solution.rhs, t < poi),
-        (carrying_capacity, t >= poi)
-    )
+    # if the point of intersecttion is a complex #, then we will not use it and will just return the original solution
+    if type(poi) == sympy.core.add.Add:
+        piecewise_func = solution.rhs
+    else:
+        piecewise_func = Piecewise(
+            (solution.rhs, t < poi),
+            (carrying_capacity, t >= poi)
+        )
     return piecewise_func
 
 if __name__=="__main__":
