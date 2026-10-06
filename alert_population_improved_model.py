@@ -47,9 +47,9 @@ Future Work:
 - Integrate dynamic population growth and death into the model.
 """
 
-def form_differential_equation(prop_constant: float, carrying_capacity: int):
+def form_differential_equation(spread_rate: float, initial_population: int):
     A = Function('A')
-    return Eq(diff(A(t), t), prop_constant * A(t) * (1 - A(t) / carrying_capacity))
+    return Eq(diff(A(t), t), spread_rate * initial_population * A(t) * (1 - A(t) / initial_population))
 
 def solve_equation(equation: Eq, a_0: int):
     A = Function('A')
@@ -86,10 +86,10 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Insert parameters for modeling rabbit alert calls.")
     parser.add_argument("--capacity", type=int, default=15, help="Maximum number of rabbits in the population")
     parser.add_argument("--initial_alerted", type=int, default=1, help="Number of rabbits that detect the predator immediately")
-    parser.add_argument("--prop_constant", type=float, default = 0.005, help="Fastness of how rabbits alert each other")
+    parser.add_argument("--spread_rate", type=float, default = 0.1, help="Fastness of how rabbits alert each other")
     args = parser.parse_args()
     
-    rate = Rational(str(args.prop_constant))
+    rate = Rational(str(args.spread_rate))
     equation = form_differential_equation(rate, args.capacity)
     solution = solve_equation(equation, args.initial_alerted)
     
@@ -111,4 +111,4 @@ if __name__=="__main__":
     plt.ylabel("Number of Alerted Rabbits")
     plt.plot(time_values, alert_values)
     
-    plt.savefig(f"rabbit_alerts_naive_initial_{args.initial_alerted}_rate_{args.prop_constant}_logistic.png")
+    plt.savefig(f"rabbit_alerts_naive_initial_{args.initial_alerted}_rate_{args.spread_rate}_logistic.png")
