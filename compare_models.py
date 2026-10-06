@@ -9,8 +9,8 @@ import argparse
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Insert parameters for modeling rabbit alert calls.")
     parser.add_argument("--initial_alerted_points", type=int, nargs="+", default=[1, 2, 3], help="Number of rabbits that detect the predator immediately")
-    parser.add_argument("--spread_rates", type=float, nargs="+", default = np.arange(0.05, 1.0, 0.05), help="Fastness of how rabbits alert each other")
-    parser.add_argument("--prop_consts", type=float, nargs="+", default = np.arange(0.005, 0.01, 0.015), help="Proportionality constants for the spread rate in the logistic function")
+    parser.add_argument("--spread_rates", type=float, nargs="+", default = [0.05, 0.1, 0.25], help="Fastness of how rabbits alert each other")
+    parser.add_argument("--prop_consts", type=float, nargs="+", default = [0.005, 0.01, 0.015], help="Proportionality constants for the spread rate in the logistic function")
     parser.add_argument("--initial_populations", type=int, nargs="+", default=[5, 10, 20, 50, 100], help="Number of rabbits in the population")
     parser.add_argument("--capacities", type=int, nargs="+", default=[100, 250, 500, 1000], help="Number of rabbits as part of the habitat")
     args = parser.parse_args()
@@ -70,5 +70,5 @@ if __name__=="__main__":
                 x, y = alert_population_model.gather_data(solution, start_time=0, end_time=5, num_points=100)
                 plt.plot(x, y, label=f"Carrying Capacity: {capacity}, Proportionality Constant: {prop_constants}")
             plt.legend()
-            plt.savefig(f"rabbit_alerts_{initial_point}_spread_rate_0.1_born_dead_capped_exponential.png")
+            plt.savefig(f"rabbit_alerts_{initial_point}_logistic.png")
             plt.close()
